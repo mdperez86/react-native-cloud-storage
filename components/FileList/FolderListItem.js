@@ -30,11 +30,13 @@ export function FolderListItem({folder}) {
         ]}>
         <View style={styles.top}>
           <View style={styles.heading}>
-            <Text style={[styles.name, {color: colors.gray[20]}]}>
+            <Text
+              numberOfLines={2}
+              style={[styles.name, {color: colors.gray[20]}]}>
               {folder.name}
             </Text>
             <Text style={[styles.details, {color: colors.gray[45]}]}>
-              {folder.files}f · {filesize(folder.size)}
+              {folder.files}f · {folder.size && filesize(folder.size)}
             </Text>
           </View>
           <TouchableOpacity style={styles.button}>
@@ -45,7 +47,7 @@ export function FolderListItem({folder}) {
             />
           </TouchableOpacity>
         </View>
-        <SharedList shares={folder.shares} />
+        <SharedList shares={folder.permissions} />
       </ImageBackground>
     </TouchableOpacity>
   );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   Image,
   ImageBackground,
@@ -9,9 +9,13 @@ import {
 } from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {FONTS, ICONS, IMAGES, SIZES} from '../constants';
+import {useAuthContext} from '../contexts/AuthContext';
 
 export function SignIn({navigation}) {
   const {colors} = useTheme();
+  const {isSignedIn, userInfo, onSignIn} = useAuthContext();
+
+  useEffect(redirectIfSignedIn, [isSignedIn, userInfo, navigation]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,8 +37,14 @@ export function SignIn({navigation}) {
     </SafeAreaView>
   );
 
+  function redirectIfSignedIn() {
+    if (isSignedIn && userInfo) {
+      navigation.navigate('Main');
+    }
+  }
+
   function handleSingInPress() {
-    navigation.navigate('Main');
+    onSignIn();
   }
 }
 

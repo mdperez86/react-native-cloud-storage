@@ -14,17 +14,22 @@ import {
   StorageStatus,
 } from '../../components';
 import {FONTS, SIZES} from '../../constants';
+import {useAuthContext} from '../../contexts';
 
 export function Profile() {
   const {colors} = useTheme();
+  const {userInfo} = useAuthContext();
 
   return (
     <SafeAreaView
       style={[styles.container, {backgroundColor: colors.background}]}>
       <ScrollView>
         <Header title="Profile">
-          <PersonalInfo />
-          <StorageStatus total={100} used={78} />
+          <PersonalInfo
+            photo={userInfo?.user.photo}
+            name={userInfo?.user.givenName}
+          />
+          <StorageStatus />
           <TouchableOpacity
             activeOpacity={0.8}
             style={[styles.button, {backgroundColor: colors.secondary}]}>

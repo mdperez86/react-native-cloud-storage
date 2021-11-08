@@ -5,11 +5,12 @@ import {ICONS} from '../../constants';
 
 export function SharedListItem({share}) {
   const {colors} = useTheme();
+  const {photoLink} = share;
 
   return (
     <View style={[styles.container, {borderColor: colors.gray[99]}]}>
       <Image
-        source={share ? {uri: share} : ICONS.primarySquare}
+        source={photoLink ? {uri: photoLink} : ICONS.primarySquare}
         resizeMode="cover"
         style={[styles.avatar]}
       />

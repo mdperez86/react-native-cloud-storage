@@ -11,10 +11,11 @@ import {useTheme} from '@react-navigation/native';
 import filesize from 'filesize';
 
 import {FONTS, ICONS, SIZES} from '../../constants';
+import {categorize} from '../../api/files';
 
 export function FileListItem({file}) {
   const {colors} = useTheme();
-  const {category} = file;
+  const {category} = categorize(file);
 
   return (
     <View style={styles.container}>
@@ -23,21 +24,33 @@ export function FileListItem({file}) {
         style={styles.iconContainer}
         imageStyle={[
           styles.backgroundImage,
-          {tintColor: category.colors.secondary},
+          {tintColor: category?.colors.secondary},
         ]}>
         <Image
-          source={category.icon}
+          source={category?.icon}
           resizeMode="contain"
-          style={[styles.icon, {tintColor: category.colors.primary}]}
+          style={[styles.icon, {tintColor: category?.colors.primary}]}
         />
       </ImageBackground>
       <View style={styles.textContainer}>
-        <Text style={[styles.textTitle, {color: colors.gray[20]}]}>
+        <Text
+          numberOfLines={2}
+          style={[styles.textTitle, {color: colors.gray[20]}]}>
           {file.name}
         </Text>
-        <Text style={[styles.textDescription, {color: colors.gray[45]}]}>
-          {file.type} · {filesize(file.size)}
-        </Text>
+        {(file.fileExtension || file.size) && (
+          <View style={styles.textDescriptionContainer}>
+            {file.fileExtension && (
+              <Text style={[styles.textDescription, {color: colors.gray[45]}]}>
+                {file.fileExtension}
+                {' · '}
+              </Text>
+            )}
+            <Text style={[styles.textDescription, {color: colors.gray[45]}]}>
+              {file.size && filesize(file.size)}
+            </Text>
+          </View>
+        )}
       </View>
       <TouchableOpacity style={[styles.moreContainer]}>
         <Image
@@ -79,6 +92,10 @@ const styles = StyleSheet.create({
   },
   textTitle: {
     ...FONTS.body1,
+  },
+  textDescriptionContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   textDescription: {
     ...FONTS.subhead,

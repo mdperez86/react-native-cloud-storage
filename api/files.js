@@ -19,7 +19,7 @@ const CATEGORIES = [
       primary: COLORS.teal,
       secondary: COLORS.tealTint,
     },
-    types: ['webp'],
+    types: ['webp', 'mp4', 'avi', 'application/vnd.google-apps.video'],
   },
   {
     id: 2,
@@ -29,7 +29,14 @@ const CATEGORIES = [
       primary: COLORS.yellow,
       secondary: COLORS.yellowTint,
     },
-    types: ['jpg'],
+    types: [
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'bmp',
+      'application/vnd.google-apps.photo',
+    ],
   },
   {
     id: 3,
@@ -39,7 +46,7 @@ const CATEGORIES = [
       primary: COLORS.blue,
       secondary: COLORS.blueTint,
     },
-    types: ['mp3'],
+    types: ['mp3', 'application/vnd.google-apps.audio'],
   },
   {
     id: 4,
@@ -49,7 +56,16 @@ const CATEGORIES = [
       primary: COLORS.green,
       secondary: COLORS.greenTint,
     },
-    types: ['doc'],
+    types: [
+      'doc',
+      'docx',
+      'pdf',
+      'xls',
+      'xlsx',
+      'application/vnd.google-apps.document',
+      'application/vnd.google-apps.presentation',
+      'application/vnd.google-apps.spreadsheet',
+    ],
   },
 ];
 
@@ -58,31 +74,31 @@ const FILES = [
     id: 1,
     name: 'Music 1',
     size: 9.2 * 1024 * 8,
-    type: 'mp3',
+    fileExtension: 'mp3',
   },
   {
     id: 2,
     name: 'Image 1',
     size: 4.8 * 1024 * 8,
-    type: 'jpg',
+    fileExtension: 'jpg',
   },
   {
     id: 3,
     name: 'Zip 1',
     size: 3.7 * 1024 * 1024 * 8,
-    type: 'zip',
+    fileExtension: 'zip',
   },
   {
     id: 4,
     name: 'Doc 1',
     size: 2.3 * 1024 * 8,
-    type: 'doc',
+    fileExtension: 'doc',
   },
   {
     id: 5,
     name: 'Video 1',
     size: 1.8 * 1024 * 1024 * 8,
-    type: 'webp',
+    fileExtension: 'webp',
   },
 ];
 
@@ -164,23 +180,21 @@ export function getFiles({categoryId, search} = {}) {
 }
 
 function getCategorizeFiles(files) {
-  const defaulCategory = CATEGORIES[0];
-
   return files.map(categorize);
+}
 
-  function categorize(file) {
-    const category = CATEGORIES.find(fileMatcher(file)) ?? defaulCategory;
+export function categorize(file) {
+  const category = CATEGORIES.find(fileMatcher(file)) ?? CATEGORIES[0];
 
-    return {
-      ...file,
-      category,
-    };
-  }
+  return {
+    ...file,
+    category,
+  };
 }
 
 function categoryMatcher({types}) {
   return function byFile(file) {
-    return types.includes('*') || types.includes(file.type);
+    return types.includes('*') || types.includes(file.fileExtension);
   };
 }
 
@@ -192,7 +206,7 @@ function nameMatcher(search) {
 
 function fileMatcher(file) {
   return function byCategory({types}) {
-    return types.includes(file.type);
+    return types.includes(file.fileExtension) || types.includes(file.mimeType);
   };
 }
 

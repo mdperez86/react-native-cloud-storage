@@ -10,12 +10,14 @@ export function SharedList({shares, style}) {
 
   return (
     <View style={[styles.container, style]}>
-      {top3.map((share, index) => (
-        <SharedListItem key={index} share={share} />
-      ))}
+      {top3.map(mapSharedItem)}
       {rest > 0 && <MoreListItem count={rest} />}
     </View>
   );
+
+  function mapSharedItem(share) {
+    return <SharedListItem key={share.id} share={share} />;
+  }
 }
 
 SharedList.defaultProps = {
@@ -27,6 +29,6 @@ export default SharedList;
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    paddingLeft: SIZES.padding * 2,
+    paddingLeft: SIZES.padding,
   },
 });

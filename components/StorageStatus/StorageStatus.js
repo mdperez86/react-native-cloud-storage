@@ -1,12 +1,24 @@
 import {useTheme} from '@react-navigation/native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StyleSheet, Text, View} from 'react-native';
 import {Bar} from 'react-native-progress';
+import {GDrive} from '@robinbobin/react-native-google-drive-api-wrapper';
 import {FONTS, SIZES} from '../../constants';
+import {useAuthContext} from '../../contexts';
+import filesize from 'filesize';
 
-export function StorageStatus({total, used, dark}) {
+const gdrive = new GDrive();
+
+export function StorageStatus({dark}) {
+  const {accessToken, refreshTokens} = useAuthContext();
   const {colors} = useTheme();
-  const free = total - used;
+  const [storageQuota, setStorageQuota] = useState({limit: '1', usage: '0'});
+
+  useEffect(loadStatus, [accessToken, refreshTokens]);
+
+  const limit = Number.parseFloat(storageQuota.limit, 10);
+  const usage = Number.parseFloat(storageQuota.usage, 10);
+  const free = limit - usage;
 
   return (
     <View style={styles.container}>
@@ -16,18 +28,18 @@ export function StorageStatus({total, used, dark}) {
             styles.usedText,
             {color: dark ? colors.white : colors.primaryShade3},
           ]}>
-          {free.toFixed(1)} GB free
+          {filesize(free, {round: 0})} free
         </Text>
         <Text
           style={[
             styles.totalText,
             {color: dark ? colors.primaryTint2 : colors.primaryTint1},
           ]}>
-          of {total.toFixed(0)} GB
+          of {filesize(limit, {round: 0})}
         </Text>
       </View>
       <Bar
-        progress={used / (total > 0 ? total : 1)}
+        progress={usage / limit}
         width={null}
         color={colors.secondary}
         unfilledColor={dark ? colors.primaryShade2 : colors.primaryTint3}
@@ -36,6 +48,26 @@ export function StorageStatus({total, used, dark}) {
       />
     </View>
   );
+
+  function loadStatus() {
+    gdrive.accessToken = accessToken;
+    gdrive.about
+      .get('storageQuota')
+      .then(handleAboutResponse)
+      .catch(handleAboutError);
+
+    function handleAboutResponse(response) {
+      console.log(response);
+      setStorageQuota(response.storageQuota);
+    }
+
+    function handleAboutError(error) {
+      console.error('handleAboutError', error);
+      if (error.message === 'Invalid Credentials') {
+        refreshTokens();
+      }
+    }
+  }
 }
 
 StorageStatus.defaultProps = {

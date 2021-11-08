@@ -2,12 +2,12 @@ import React from 'react';
 import {Image, StyleSheet, Text, View} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {FONTS, SIZES} from '../../constants';
+import {useTotalFiles, useTotalFolders} from '../../hooks';
 
-const AVATAR =
-  'https://images.unsplash.com/photo-1476983109555-18ebaf412d7c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1080&q=80';
-
-export function PersonalInfo() {
+export function PersonalInfo({photo, name}) {
   const {colors} = useTheme();
+  const totalFiles = useTotalFiles();
+  const totalFolders = useTotalFolders();
 
   return (
     <View style={styles.profile}>
@@ -19,14 +19,12 @@ export function PersonalInfo() {
             shadowColor: colors.shadowColor,
           },
         ]}>
-        <Image source={{uri: AVATAR}} style={[styles.avatar]} />
+        <Image source={{uri: photo}} style={[styles.avatar]} />
       </View>
       <View style={styles.infoContainer}>
-        <Text style={[styles.name, {color: colors.primaryShade3}]}>
-          Jessie Roberts
-        </Text>
+        <Text style={[styles.name, {color: colors.primaryShade3}]}>{name}</Text>
         <Text style={[styles.description, {color: colors.gray[45]}]}>
-          1458 files · 25 folders
+          {totalFiles} files · {totalFolders} folders
         </Text>
       </View>
     </View>

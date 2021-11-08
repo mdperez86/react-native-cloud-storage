@@ -1,7 +1,8 @@
-import React from 'react';
+import React, {useCallback, useState} from 'react';
 import {StyleSheet} from 'react-native';
 import {useTheme} from '@react-navigation/native';
 import {Tabs} from 'react-native-collapsible-tab-view';
+import debounce from 'lodash-es/debounce';
 import {
   Header,
   SearchBar,
@@ -13,10 +14,11 @@ import {Files, Folders} from './cloud';
 
 export function CloudStorage() {
   const {colors} = useTheme();
+  const [search, setSearch] = useState('');
 
   return (
     <Tabs.Container
-      renderHeader={TabsHeaderComponent}
+      renderHeader={useCallback(TabsHeaderComponent, [])}
       renderTabBar={TopTabBar}
       initialTabName="Files"
       tabBarHeight={40}
@@ -26,32 +28,36 @@ export function CloudStorage() {
       ]}
       style={[styles.container, {backgroundColor: colors.background}]}>
       <Tabs.Tab name="Files">
-        <Files />
+        <Files search={search} />
       </Tabs.Tab>
       <Tabs.Tab name="Folders">
-        <Folders />
+        <Folders search={search} />
       </Tabs.Tab>
     </Tabs.Container>
   );
+
+  function TabsHeaderComponent() {
+    return (
+      <>
+        <Header
+          dark={true}
+          title="Cloud Storage"
+          subtitle="at the moment you have">
+          <StorageStatus dark={true} />
+        </Header>
+        <SearchBar>
+          <SearchBox onChangeText={debounce(handleSearchChange, 400)} />
+        </SearchBar>
+      </>
+    );
+
+    function handleSearchChange(text) {
+      setSearch(text);
+    }
+  }
 }
 
 export default CloudStorage;
-
-function TabsHeaderComponent() {
-  return (
-    <>
-      <Header
-        dark={true}
-        title="Cloud Storage"
-        subtitle="at the moment you have">
-        <StorageStatus total={100} used={78} dark={true} />
-      </Header>
-      <SearchBar>
-        <SearchBox />
-      </SearchBar>
-    </>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {},
